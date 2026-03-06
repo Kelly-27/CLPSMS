@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Officer Dashboard | Litein Police{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    .desk-wrapper { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #263238; min-height: 100vh; margin: -1.5rem; }
+    .custom-sidebar { position:fixed; left:0; top:0; width:280px; height:100vh; background: linear-gradient(180deg, #1a237e, #283593); color:#eceff1; padding:2rem 1.5rem; box-shadow:5px 0 25px rgba(0,0,0,0.2); z-index: 1040; }
+    .sidebar-logo { font-size:2.8rem; color:#64b5f6; }
+    .nav-item { padding:1.2rem 1.5rem; border-radius:12px; margin-bottom:0.8rem; display:flex; align-items:center; gap:1rem; color:#eceff1; text-decoration:none; transition:0.3s; }
+    .nav-item:hover { background:rgba(255,255,255,0.15); transform:translateX(8px); color: white; }
+    .nav-item i { font-size:1.6rem; }
+
+    .custom-content { margin-left:280px; padding:3rem; }
+    .custom-content h1 { font-size:2.5rem; background:linear-gradient(135deg,#1a237e,#3949ab); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight: bold;}
+
+    .dash-card { background:white; border-radius:18px; padding:1.5rem; box-shadow:0 10px 30px rgba(0,0,0,0.05); transition:0.3s; text-decoration: none; color: inherit; display: block; border-left: 5px solid #1a237e; }
+    .dash-card:hover { transform:translateY(-5px); box-shadow:0 15px 30px rgba(26,35,126,0.15); color: inherit; }
+</style>
+
+<div class="desk-wrapper">
+    <div class="custom-sidebar">
+        <div style="text-align:center; margin-bottom:3rem;">
+            <i class="bi bi-star-fill sidebar-logo"></i>
+            <h3 style="color:white; margin-top:10px;">Officer Desk</h3>
+            <small class="text-light opacity-75">Litein Police Station</small>
+        </div>
+        <a href="{% url 'officer_dashboard' %}" class="nav-item bg-white text-dark"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard</a>
+
+        <a href="{% url 'book_suspect' %}" class="nav-item"><i class="bi bi-person-lines-fill"></i> Add Arrested Person</a>
+
+        <a href="#" class="nav-item"><i class="bi bi-file-earmark-pdf-fill"></i> Arrest Reports</a>
+        <a href="#" class="nav-item"><i class="bi bi-calendar2-check-fill"></i> Apply for Leave</a>
+    </div>
+
+    <div class="custom-content">
+
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h1>Welcome back, Detective {{ request.user.last_name }}! 🕵️‍♂️</h1>
+                <p style="font-size:1.2rem; color:#455a64; margin-bottom:0;">CID / Investigations Department</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="dash-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0 text-primary">{{ assigned_cases.count }}</h3>
+                            <p class="text-muted mb-0">Active Cases</p>
+                        </div>
+                        <i class="bi bi-briefcase-fill fs-1 text-primary opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <a href="{% url 'book_suspect' %}" class="dash-card border-success text-decoration-none">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 text-success">Book Suspect</h5>
+                            <p class="text-muted mb-0">Generate Arrest Report</p>
+                        </div>
+                        <i class="bi bi-person-bounding-box fs-1 text-success opacity-50"></i>
+                    </div>
+                </a>
+            </div>
+
+
+            <div class="col-md-4">
+                <a href="#" class="dash-card border-warning text-decoration-none">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 text-warning text-dark">Leave Portal</h5>
+                            <p class="text-muted mb-0">Apply / Check Status</p>
+                        </div>
+                        <i class="bi bi-calendar-range-fill fs-1 text-warning opacity-50"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-list-task text-primary me-2"></i> My Assigned Workload</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th>OB Number</th>
+                                <th>Date Logged</th>
+                                <th>Incident Type</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for case in assigned_cases %}
+                                <tr>
+                                    <td class="fw-bold text-primary ps-3">{{ case.ob_number }}</td>
+                                    <td>{{ case.date_logged|date:"d M Y, H:i" }}</td>
+                                    <td>{{ case.get_incident_type_display }}</td>
+                                    <td>
+                                        {% if case.status == 'open' %}
+                                            <span class="badge bg-danger rounded-pill px-3">Open</span>
+                                        {% elif case.status == 'under_investigation' %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Investigating</span>
+                                        {% else %}
+                                            <span class="badge bg-success rounded-pill px-3">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <a href="{% url 'generate_case_pdf' case.id %}" target="_blank" class="btn btn-sm btn-light text-primary border me-1" title="Print Case File">
+                                            <i class="bi bi-printer"></i>
+                                        </a>
+
+                                        {% if case.status != 'closed' %}
+                                            <a href="{% url 'close_case' case.id %}" class="btn btn-sm btn-success" onclick="return confirm('Mark this case as fully closed?');" title="Close Case">
+                                                <i class="bi bi-check2-circle"></i> Close
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-shield-check fs-1 d-block mb-3 text-success opacity-50"></i>
+                                        <h5>No Active Cases</h5>
+                                        <p>You have no assigned workload at this time.</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+<div class="card shadow-sm border-0 border-top border-info border-4 rounded-4 mt-4">
+    <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-week text-info me-2"></i> My Upcoming Shifts</h5>
+    </div>
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush rounded-bottom-4">
+            {% for shift in upcoming_shifts %}
+                <li class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark">{{ shift.shift_date|date:"l, F j, Y" }}</h6>
+                        <small class="text-muted d-block">
+                            <i class="bi bi-shield-check text-primary"></i> {{ shift.get_duty_type_display }}
+                            {% if shift.commander_notes %}
+                                <span class="ms-2 text-warning"><i class="bi bi-exclamation-circle"></i> Note: {{ shift.commander_notes }}</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div>
+                        {% if shift.shift_time == 'morning' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm"><i class="bi bi-brightness-alt-high"></i> Morning</span>
+                        {% elif shift.shift_time == 'evening' %}
+                            <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm"><i class="bi bi-sunset"></i> Evening</span>
+                        {% else %}
+                            <span class="badge bg-dark px-3 py-2 rounded-pill shadow-sm"><i class="bi bi-moon-stars"></i> Night</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item p-4 text-center text-muted">
+                    <i class="bi bi-cup-hot fs-2 d-block mb-2 opacity-50"></i>
+                    You have no upcoming shifts assigned. Enjoy your time off!
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+    </div>
+</div>
+{% endblock %}

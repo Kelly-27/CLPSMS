@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Duty Roster | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-week text-primary me-2"></i> Station Duty Roster</h2>
+
+        <div>
+            {% if request.user.profile.role == 'police_commander' %}
+                <a href="{% url 'add_roster' %}" class="btn btn-primary me-2 shadow-sm">
+                    <i class="bi bi-plus-circle"></i> Assign Shift
+                </a>
+                <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left"></i> Back to HQ</a>
+            {% elif request.user.profile.role == 'officer' %}
+                <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 border-top border-info border-4 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Officer</th>
+                            <th>Shift Time</th>
+                            <th>Duty Assignment</th>
+                            <th>Commander Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for shift in shifts %}
+                            <tr>
+                                <td class="fw-bold text-dark"><i class="bi bi-calendar-event text-muted me-1"></i> {{ shift.shift_date|date:"D, d M Y" }}</td>
+
+                                <td class="fw-bold text-primary">
+                                    <i class="bi bi-person-badge"></i>
+                                    {{ shift.officer.first_name }} {{ shift.officer.last_name|default:shift.officer.username }}
+                                </td>
+
+                                <td>
+                                    {% if shift.shift_time == 'morning' %}
+                                        <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-brightness-alt-high"></i> Morning</span>
+                                    {% elif shift.shift_time == 'evening' %}
+                                        <span class="badge bg-primary px-2 py-1"><i class="bi bi-sunset"></i> Evening</span>
+                                    {% else %}
+                                        <span class="badge bg-dark px-2 py-1"><i class="bi bi-moon-stars"></i> Night</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary px-2 py-1">{{ shift.get_duty_type_display }}</span>
+                                </td>
+
+                                <td class="text-muted small">
+                                    {% if shift.commander_notes %}
+                                        {{ shift.commander_notes }}
+                                    {% else %}
+                                        <span class="fst-italic opacity-50">Standard duties</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x fs-1 d-block mb-3 opacity-50"></i>
+                                    <h5>No Shifts Assigned</h5>
+                                    <p>The duty roster is currently empty.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

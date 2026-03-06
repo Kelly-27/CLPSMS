@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Station Inventory | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-box-seam text-primary me-2"></i> Station Inventory</h2>
+        
+        <div>
+            {% if request.user.profile.role == 'police_commander' %}
+                <a href="{% url 'add_inventory_item' %}" class="btn btn-primary me-2 shadow-sm">
+                    <i class="bi bi-plus-circle"></i> Add Item
+                </a>
+                <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left"></i> Back to HQ</a>
+            {% elif request.user.profile.role == 'officer' %}
+                <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 border-top border-warning border-4 rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>SN / Qty</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ item.item_name }}</td>
+                                
+                                <td><span class="badge bg-secondary">{{ item.get_category_display }}</span></td>
+                                
+                                <td>
+                                    {% if item.serial_number %}
+                                        <small class="text-muted">SN:</small> {{ item.serial_number }}
+                                    {% else %}
+                                        <small class="text-muted">Qty:</small> {{ item.quantity }}
+                                    {% endif %}
+                                </td>
+                                
+                                <td>
+                                    {% if item.status == 'available' %}
+                                        <span class="badge bg-success px-2 py-1">Available</span>
+                                    {% elif item.status == 'assigned' %}
+                                        <span class="badge bg-primary px-2 py-1">Assigned</span>
+                                    {% elif item.status == 'maintenance' %}
+                                        <span class="badge bg-warning text-dark px-2 py-1">Maintenance</span>
+                                    {% else %}
+                                        <span class="badge bg-danger px-2 py-1">Lost/Damaged</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td>
+                                    {% if item.assigned_to %}
+                                        <i class="bi bi-person-badge text-primary"></i> 
+                                        {{ item.assigned_to.first_name }} {{ item.assigned_to.last_name|default:item.assigned_to.username }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="text-muted small">{{ item.last_updated|date:"d M Y, H:i" }}</td>
+                            <td>
+                                    {% if request.user.profile.role == 'police_commander' %}
+                                        <a href="{% url 'update_inventory_item' item.id %}" class="btn btn-sm btn-outline-primary shadow-sm">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-boxes fs-1 d-block mb-3 opacity-50"></i>
+                                    <h5>Inventory is Empty</h5>
+                                    <p>No equipment or stationery has been logged yet.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

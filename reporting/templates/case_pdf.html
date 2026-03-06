@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>{{ case.ob_number }}</title>
+<style>
+@page {
+size: a4 portrait;
+margin: 1.5cm;
+}
+body { font-family: Helvetica, sans-serif; font-size: 12px; color: #333; }
+h1, h2, h3 { text-align: center; color: #000; margin-bottom: 5px; }
+
+    .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+    .logo { width: 110px; height: auto; margin-bottom: 10px; }
+
+    .section-title { background-color: #f0f0f0; padding: 5px; font-weight: bold; border: 1px solid #ccc; margin-top: 15px; margin-bottom: 10px; }
+    table { width: 100%; margin-bottom: 15px; }
+    td { padding: 5px; vertical-align: top; }
+    .label { font-weight: bold; width: 150px; }
+    .signature-box { margin-top: 20px; width: 100%; }
+    .sig-line { border-bottom: 1px solid #000; width: 250px; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <img src="{% static 'logo.png' %}" class="logo" alt="Kenya Police Logo">
+    <h2>LITEIN POLICE STATION</h2>
+    <h3>OFFICIAL OCCURRENCE REPORT</h3>
+</div>
+
+<table>
+    <tr>
+        <td class="label">OB NUMBER:</td>
+        <td><strong style="font-size: 14px;">{{ case.ob_number }}</strong></td>
+        <td class="label">DATE LOGGED:</td>
+        <td>{{ case.date_logged|date:"d M Y, H:i" }}</td>
+    </tr>
+    <tr>
+        <td class="label">INCIDENT TYPE:</td>
+        <td>{{ case.get_incident_type_display|upper }}</td>
+        <td class="label">STATUS:</td>
+        <td>{{ case.get_status_display|upper }}</td>
+    </tr>
+</table>
+
+<div class="section-title">INCIDENT DETAILS</div>
+<table>
+    <tr>
+        <td class="label">Date & Time of Incident:</td>
+        <td>{{ case.incident_datetime|date:"d M Y, H:i" }}</td>
+    </tr>
+    <tr>
+        <td class="label">Location:</td>
+        <td>{{ case.location }}</td>
+    </tr>
+    <tr>
+        <td class="label">Description:</td>
+        <td style="text-align: justify;">{{ case.description }}</td>
+    </tr>
+</table>
+
+<div class="section-title">REPORTER INFORMATION</div>
+<table>
+    <tr>
+        <td class="label">Full Name:</td>
+        <td>{{ case.reporter_name }}</td>
+        <td class="label">ID / Passport No:</td>
+        <td>{{ case.reporter_id_number }}</td>
+    </tr>
+    <tr>
+        <td class="label">Phone Number:</td>
+        <td colspan="3">{{ case.reporter_phone }}</td>
+    </tr>
+</table>
+
+<div class="section-title">INVESTIGATION DETAILS</div>
+<table>
+    <tr>
+        <td class="label">Persons Involved:</td>
+        <td>{{ case.persons_involved|default:"None specified"|linebreaksbr }}</td>
+    </tr>
+    <tr>
+        <td class="label">Additional Evidence:</td>
+        <td>{{ case.additional_info|default:"None specified"|linebreaksbr }}</td>
+    </tr>
+    <tr>
+        <td class="label">Assigned Officers:</td>
+        <td>
+            {% for officer in case.assigned_officers.all %}
+                {{ officer.profile.get_rank_display }} {{ officer.last_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                Pending Assignment
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+
+<table class="signature-box">
+    <tr>
+        <td>
+            <div>___________________________________</div>
+            <div style="margin-top: 5px;">Signature of Reporter</div>
+        </td>
+        <td style="text-align: right;">
+            <div>___________________________________</div>
+            <div style="margin-top: 5px;">Signature of Desk Officer</div>
+            <div style="margin-top: 5px; color: #555;">({{ case.desk_officer.first_name }} {{ case.desk_officer.last_name }})</div>
+        </td>
+    </tr>
+</table>
+
+<div style="text-align: center; margin-top: 20px; border: 1px solid #000; width: 150px; height: 80px; margin-left: auto; margin-right: auto; padding-top: 30px; color: #999;">
+    STAMP
+</div>
+</body>
+</html>

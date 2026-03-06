@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Log Evidence | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="max-width: 800px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-fingerprint text-primary me-2"></i> Log New Evidence</h2>
+        
+        {% if request.user.profile.role == 'police_commander' %}
+            <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to HQ</a>
+        {% elif request.user.profile.role == 'officer' %}
+            <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+        {% else %}
+            <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-dark text-white p-4 rounded-top-4">
+            <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i> Evidence Intake Form</h5>
+            <small class="text-white-50">Chain of custody begins upon submission.</small>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Item Name</label>
+                        {{ form.item_name }}
+                        <div class="form-text">{{ form.item_name.help_text }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Related Case (OB Number)</label>
+                        {{ form.related_case }}
+                        <div class="form-text text-muted">Leave blank if pending.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Initial Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Storage Location</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-safe2"></i></span>
+                            {{ form.storage_location }}
+                        </div>
+                        <div class="form-text">{{ form.storage_location.help_text }}</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Detailed Description</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Evidence Photo (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-camera"></i></span>
+                            {{ form.image }}
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-5">
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">
+                        <i class="bi bi-person-badge"></i> Logging Officer: <strong>{{ request.user.username }}</strong>
+                    </span>
+                    <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill">
+                        <i class="bi bi-lock-fill me-2"></i> Save
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

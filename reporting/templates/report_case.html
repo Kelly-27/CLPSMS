@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Report New Case | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-text-fill text-primary"></i> Log New Case (OB)</h2>
+        <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary">Back to Desk</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        Please correct the errors below.
+                    </div>
+                {% endif %}
+
+                <h5 class="text-primary border-bottom pb-2 mb-3">Incident Details</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Incident Type</label>
+                        {{ form.incident_type }}
+                        <div class="text-danger small">{{ form.incident_type.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Date & Time of Incident</label>
+                        {{ form.incident_datetime }}
+                        <div class="text-danger small">{{ form.incident_datetime.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Location</label>
+                    {{ form.location }}
+                    <div class="text-danger small">{{ form.location.errors }}</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Incident Description</label>
+                    {{ form.description }}
+                    <div class="text-danger small">{{ form.description.errors }}</div>
+                </div>
+
+                <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">Reporter Details</h5>
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Full Name</label>
+                        {{ form.reporter_name }}
+                        <div class="text-danger small">{{ form.reporter_name.errors }}</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">ID / Passport No.</label>
+                        {{ form.reporter_id_number }}
+                        <div class="text-danger small">{{ form.reporter_id_number.errors }}</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Phone Number</label>
+                        {{ form.reporter_phone }}
+                        <div class="text-danger small">{{ form.reporter_phone.errors }}</div>
+                    </div>
+                </div>
+
+                <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">Investigation & Evidence</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Persons Involved</label>
+                        {{ form.persons_involved }}
+                        <div class="text-danger small">{{ form.persons_involved.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Additional Evidence/Info</label>
+                        {{ form.additional_info }}
+                        <div class="text-danger small">{{ form.additional_info.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-4 bg-light p-3 rounded border">
+                    <label class="form-label fw-bold text-dark">Assign Investigating Officers</label>
+                    {{ form.assigned_officers }}
+                    <small class="text-muted d-block mt-1"><i class="bi bi-info-circle"></i> Hold CTRL (or CMD on Mac) to select multiple officers.</small>
+                    <div class="text-danger small">{{ form.assigned_officers.errors }}</div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit & Generate OB Number</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

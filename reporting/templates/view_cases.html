@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}View Cases | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-journal-text text-primary"></i> Station Occurrence Book</h2>
+        {% if request.user.profile.role == 'police_commander' %}
+    <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+{% elif request.user.profile.role == 'officer' %}
+    <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+{% else %}
+    <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
+{% endif %}
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>OB Number</th>
+                            <th>Date Logged</th>
+                            <th>Incident Type</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in cases %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ case.ob_number }}</td>
+                                <td>{{ case.date_logged|date:"d M Y, H:i" }}</td>
+                                <td>{{ case.get_incident_type_display }}</td>
+                                <td>{{ case.location }}</td>
+                                <td>
+                                    {% if case.status == 'open' %}
+                                        <span class="badge bg-danger">Open</span>
+                                    {% elif case.status == 'under_investigation' %}
+                                        <span class="badge bg-warning text-dark">Investigating</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Closed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'generate_case_pdf' case.id %}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+
+                                    {% if case.status != 'closed' %}
+                                        <a href="{% url 'close_case' case.id %}" class="btn btn-sm btn-success mb-1" onclick="return confirm('Override and close this case?');">
+                                            <i class="bi bi-check2-circle"></i>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if request.user.profile.role == 'police_commander' %}
+                                        <form method="POST" action="{% url 'delete_case' case.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('SECURITY WARNING: Are you sure you want to permanently delete this official record?');">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                                    No cases have been logged yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

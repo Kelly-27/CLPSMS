@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Commander Dashboard | Litein Police{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* Clean, bright background to let the colors pop */
+    .desk-wrapper { font-family: 'Poppins', sans-serif; background: #f4f7f6; color: #2d3748; min-height: 100vh; margin: -1.5rem; position: relative; z-index: 1; }
+
+    /* Deep Rich Navy Sidebar */
+    .custom-sidebar { position:fixed; left:0; top:0; width:280px; height:100vh; background: linear-gradient(180deg, #1a202c, #2d3748); color:#e2e8f0; padding:2rem 1.5rem; box-shadow:5px 0 25px rgba(0,0,0,0.15); z-index: 9999; display: flex; flex-direction: column; }
+    .sidebar-logo { font-size:2.8rem; color:#f6e05e; } /* Bright Gold Star */
+
+    .nav-item { padding:1.0rem 1.5rem; border-radius:12px; margin-bottom:0.5rem; display:flex; align-items:center; gap:1rem; color:#cbd5e0; text-decoration:none; transition:0.3s; pointer-events: auto; font-weight: 500; }
+    .nav-item:hover { background:rgba(255, 255, 255, 0.1); transform:translateX(8px); color: #ffffff; }
+    .nav-item i { font-size:1.4rem; }
+
+    /* Bottom Profile Panel */
+    .sidebar-footer { margin-top: auto; }
+    .user-card { background: rgba(0, 0, 0, 0.2); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s; }
+    .user-card:hover { background: rgba(0, 0, 0, 0.3); border-color: rgba(255, 255, 255, 0.1); }
+    .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #f6e05e, #d69e2e); color: #1a202c; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0; }
+    .logout-btn { display: flex; align-items: center; justify-content: center; gap: 0.8rem; padding: 0.8rem 1rem; border-radius: 12px; background: rgba(252, 129, 129, 0.15); color: #feb2b2; text-decoration: none; transition: 0.3s; font-weight: 500; margin-top: 0.8rem; }
+    .logout-btn:hover { background: rgba(229, 62, 62, 0.8); color: #ffffff; transform: translateY(-2px); }
+
+    .custom-content { margin-left:280px; padding:3rem; position: relative; z-index: 9998; }
+    .custom-content h1 { font-size:2.5rem; color: #1a202c; font-weight: bold;}
+
+    /* Base Card Styling */
+    .dash-card { background:white; border-radius:18px; padding:2rem; box-shadow:0 4px 15px rgba(0,0,0,0.03); transition:all 0.3s ease; text-decoration: none; display: block; position: relative; pointer-events: auto; border-left: 5px solid #e2e8f0; }
+    .dash-card h5 { color: #2d3748; font-weight: 700; margin-top: 1rem; transition: 0.3s; }
+    .dash-card p { color: #718096; margin-bottom: 0; }
+
+    /* Vibrant Color-Coded Hover Effects */
+    .card-blue:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(49, 130, 206, 0.15); border-left-color: #3182ce; }
+    .card-blue:hover h5 { color: #3182ce; }
+
+    .card-red:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(229, 62, 62, 0.15); border-left-color: #e53e3e; }
+    .card-red:hover h5 { color: #e53e3e; }
+
+    .card-green:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(56, 161, 105, 0.15); border-left-color: #38a169; }
+    .card-green:hover h5 { color: #38a169; }
+
+    .card-purple:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(128, 90, 213, 0.15); border-left-color: #805ad5; }
+    .card-purple:hover h5 { color: #805ad5; }
+
+    .card-teal:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(49, 151, 149, 0.15); border-left-color: #319795; }
+    .card-teal:hover h5 { color: #319795; }
+
+    .card-yellow:hover { transform:translateY(-6px); box-shadow:0 15px 30px rgba(214, 158, 46, 0.15); border-left-color: #d69e2e; }
+    .card-yellow:hover h5 { color: #d69e2e; }
+</style>
+
+<div class="desk-wrapper">
+    <div class="custom-sidebar">
+        <div style="text-align:center; margin-bottom:2rem;">
+            <i class="bi bi-star-badge-fill sidebar-logo"></i>
+            <h3 style="color:white; margin-top:10px;">Commander</h3>
+            <small class="text-gray-400 opacity-75">Litein Police Station</small>
+        </div>
+
+        <div class="sidebar-links">
+            <a href="{% url 'view_cases' %}" class="nav-item"><i class="bi bi-journal-text" style="color: #63b3ed;"></i> Station OB</a>
+            <a href="{% url 'view_inmates' %}" class="nav-item"><i class="bi bi-people-fill" style="color: #fc8181;"></i> Custody Ledger</a>
+            <a href="{% url 'view_officers' %}" class="nav-item"><i class="bi bi-person-badge-fill" style="color: #68d391;"></i> Personnel List</a>
+
+            <hr class="border-secondary my-3 opacity-25">
+            <small class="text-gray-500 text-uppercase px-3 fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Admin Tools</small>
+
+            <a href="{% url 'add_officer' %}" class="nav-item mt-2"><i class="bi bi-person-plus-fill" style="color: #a0aec0;"></i> Add Officer</a>
+            <a href="{% url 'set_report_desk_password' %}" class="nav-item"><i class="bi bi-key-fill" style="color: #a0aec0;"></i> Desk Password</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-card d-flex align-items-center">
+                <div class="user-avatar">{{ user.username|make_list|first|upper }}</div>
+                <div class="ms-3 overflow-hidden">
+                    <h6 class="mb-0 text-white text-truncate" style="font-size: 0.95rem;">{{ user.first_name|default:user.username }}</h6>
+                    <small class="text-gray-400 d-block text-truncate" style="font-size: 0.8rem; color: #a0aec0;">Super Admin</small>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="bi bi-box-arrow-right fs-5"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="custom-content">
+
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <h1>Commander {{ user.last_name|default:user.username }} 🎖️</h1>
+                <p style="font-size:1.2rem; color:#718096; margin-bottom:0;">Station Oversight & Administration</p>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1.5rem; margin-bottom:3rem;">
+
+            <a href="{% url 'view_cases' %}" class="dash-card card-blue">
+                <i class="bi bi-file-earmark-text-fill" style="font-size:3rem; color:#3182ce;"></i>
+                <h5>View Cases (OB)</h5><p>Review all reported incidents</p>
+            </a>
+
+            <a href="{% url 'view_inmates' %}" class="dash-card card-red">
+                <i class="bi bi-people-fill" style="font-size:3rem; color:#e53e3e;"></i>
+                <h5>View Inmates</h5><p>Monitor custody ledger</p>
+            </a>
+
+            <a href="{% url 'view_officers' %}" class="dash-card card-green">
+                <i class="bi bi-person-badge-fill" style="font-size:3rem; color:#38a169;"></i>
+                <h5>Station Personnel</h5><p>List all active officers</p>
+            </a>
+
+            <a href="{% url 'view_evidence' %}" class="dash-card card-purple">
+                <i class="bi bi-fingerprint" style="font-size:3rem; color:#805ad5;"></i>
+                <h5>Evidence Locker</h5><p>Access evidence records</p>
+            </a>
+
+            <a href="{% url 'view_rosters' %}" class="dash-card card-teal">
+                <i class="bi bi-calendar-fill" style="font-size:3rem; color:#319795;"></i>
+                <h5>Duty Rosters</h5><p>Check officer schedules</p>
+            </a>
+
+            <a href="{% url 'view_inventory' %}" class="dash-card card-yellow">
+                <i class="bi bi-box-seam" style="font-size:3rem; color:#d69e2e;"></i>
+                <h5>Station Inventory</h5><p>Manage equipment</p>
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

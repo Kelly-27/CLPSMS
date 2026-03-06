@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Shift | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="max-width: 800px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-plus text-primary me-2"></i> Assign Officer Shift</h2>
+        <a href="{% url 'view_rosters' %}" class="btn btn-outline-secondary shadow-sm"><i class="bi bi-arrow-left"></i> Back to Roster</a>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-dark text-white p-4 rounded-top-4">
+            <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i> Shift Assignment Form</h5>
+            <small class="text-white-50">Schedule an officer for a specific date, time, and duty.</small>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger rounded-3 shadow-sm mb-4">
+                        {% for error in form.non_field_errors %}
+                            <strong><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}</strong>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Select Officer</label>
+                        {{ form.officer }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Shift Date</label>
+                        {{ form.shift_date }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Shift Time</label>
+                        {{ form.shift_time }}
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Duty Assignment</label>
+                        {{ form.duty_type }}
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-dark">Special Instructions (Optional)</label>
+                        {{ form.commander_notes }}
+                        <div class="form-text">These instructions will be visible to the officer on their dashboard.</div>
+                    </div>
+                </div>
+
+                <hr class="my-5">
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill">
+                        <i class="bi bi-calendar-check-fill me-2"></i> Assign Shift
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
