@@ -4,17 +4,31 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-journal-text text-primary"></i> Station Occurrence Book</h2>
-        {% if request.user.profile.role == 'police_commander' %}
-    <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
-{% elif request.user.profile.role == 'officer' %}
-    <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
-{% else %}
-    <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
-{% endif %}
+        <div>
+            {% if request.user.profile.role == 'police_commander' %}
+                <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            {% elif request.user.profile.role == 'officer' %}
+                <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+            {% else %}
+                <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
+            {% endif %}
+        </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-5">
+            <form method="GET" action="{% url 'view_cases' %}" class="d-flex">
+                <input type="text" name="q" value="{{ query }}" class="form-control me-2 shadow-sm border-secondary" placeholder="Search OB Number or Keyword...">
+                <button class="btn btn-dark shadow-sm px-4" type="submit"><i class="bi bi-search"></i></button>
+                {% if query %}
+                    <a href="{% url 'view_cases' %}" class="btn btn-outline-danger shadow-sm ms-2"><i class="bi bi-x-circle"></i> Clear</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">

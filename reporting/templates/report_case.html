@@ -86,8 +86,14 @@
                     <div class="text-danger small">{{ form.assigned_officers.errors }}</div>
                 </div>
 
+                <div class="mb-4 p-3 rounded border border-primary bg-white shadow-sm">
+                    <label class="form-label fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>Logging Officer</label>
+                    {{ form.desk_officer }}
+                    <small class="text-muted d-block mt-1">Please select your name to officially sign and authorize this OB entry.</small>
+                    <div class="text-danger small">{{ form.desk_officer.errors }}</div>
+                </div>
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">Submit & Generate OB Number</button>
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                 </div>
             </form>
         </div>

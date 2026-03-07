@@ -68,16 +68,21 @@
                     </div>
                 </div>
 
-                <hr class="my-5">
-                
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-muted small">
-                        <i class="bi bi-person-badge"></i> Logging Officer: <strong>{{ request.user.username }}</strong>
-                    </span>
-                    <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill">
-                        <i class="bi bi-lock-fill me-2"></i> Save
+                <hr class="my-4">
+
+                <div class="mb-4 p-3 rounded border border-warning bg-light shadow-sm">
+                    <label class="form-label fw-bold text-dark"><i class="bi bi-person-badge me-2"></i>Logging Officer</label>
+                    {{ form.logging_officer }}
+                    <small class="text-muted d-block mt-1">Please select your name to officially sign this item into the evidence locker.</small>
+                    <div class="text-danger small">{{ form.logging_officer.errors }}</div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm rounded-pill">
+                        <i class="bi bi-lock-fill me-2"></i> Save Evidence
                     </button>
                 </div>
+
             </form>
             
         </div>

@@ -10,10 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 1. Colorful & Smooth Global Background */
         body {
             font-family: 'Poppins', sans-serif;
-            /* A soft, colorful blue-to-indigo wash instead of flat grey */
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             color: #2d3748;
             -webkit-font-smoothing: antialiased;
@@ -23,7 +21,6 @@
             flex-direction: column;
         }
 
-        /* 2. Premium Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -39,9 +36,7 @@
             background: linear-gradient(180deg, #2b6cb0, #6b46c1);
         }
 
-        /* 3. Vibrant Glassmorphism Navbar */
         .glass-navbar {
-            /* Rich colorful gradient with transparency for the blur */
             background: linear-gradient(90deg, rgba(26, 41, 128, 0.9) 0%, rgba(38, 208, 206, 0.9) 100%) !important;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -86,9 +81,7 @@
             transform: translateY(-1px);
         }
 
-        /* 4. Vibrant Gradient Logout Button */
         .logout-pill {
-            /* Punchy sunset gradient for the logout button */
             background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
             color: #ffffff !important;
             border-radius: 50px;
@@ -108,15 +101,13 @@
             transform: translateY(-2px) scale(1.02);
         }
 
-        /* Navbar Toggler for mobile */
         .navbar-toggler {
             border-color: rgba(255,255,255,0.5) !important;
         }
         .navbar-toggler-icon {
-            filter: invert(1); /* Makes the hamburger icon white */
+            filter: invert(1);
         }
 
-        /* Ensure main content expands correctly */
         main {
             flex: 1;
         }
@@ -128,10 +119,21 @@
     <nav class="navbar navbar-expand-lg glass-navbar">
         <div class="container-fluid px-4">
 
-            <a class="navbar-brand" href="{% url 'reporting_desk' %}">
-                <i class="bi bi-shield-fill-check"></i> CLPSMS
-            </a>
-
+            <a class="navbar-brand fw-bold text-white" href="
+    {% if request.user.is_authenticated %}
+        {% if request.user.profile.role == 'police_commander' %}
+            {% url 'commander_dashboard' %}
+        {% elif request.user.profile.role == 'officer' %}
+            {% url 'officer_dashboard' %}
+        {% else %}
+            {% url 'reporting_desk' %}
+        {% endif %}
+    {% else %}
+        /
+    {% endif %}
+">
+    <i class="bi bi-shield-fill-check text-warning me-2"></i> CLPSMS
+</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>

@@ -20,6 +20,18 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-5">
+            <form method="GET" action="{% url 'view_inventory' %}" class="d-flex">
+                <input type="text" name="q" value="{{ query }}" class="form-control me-2 shadow-sm border-secondary" placeholder="Search Item, Serial No, or Category...">
+                <button class="btn btn-dark shadow-sm px-4" type="submit"><i class="bi bi-search"></i></button>
+                {% if query %}
+                    <a href="{% url 'view_inventory' %}" class="btn btn-outline-danger shadow-sm ms-2"><i class="bi bi-x-circle"></i> Clear</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
     <div class="card shadow-sm border-0 border-top border-warning border-4 rounded-4">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -32,15 +44,15 @@
                             <th>Status</th>
                             <th>Assigned To</th>
                             <th>Last Updated</th>
-                        </tr>
+                            <th>Actions</th> </tr>
                     </thead>
                     <tbody>
-                        {% for item in items %}
+                        {% for item in inventory %}
                             <tr>
                                 <td class="fw-bold text-dark">{{ item.item_name }}</td>
-                                
+
                                 <td><span class="badge bg-secondary">{{ item.get_category_display }}</span></td>
-                                
+
                                 <td>
                                     {% if item.serial_number %}
                                         <small class="text-muted">SN:</small> {{ item.serial_number }}
@@ -48,7 +60,7 @@
                                         <small class="text-muted">Qty:</small> {{ item.quantity }}
                                     {% endif %}
                                 </td>
-                                
+
                                 <td>
                                     {% if item.status == 'available' %}
                                         <span class="badge bg-success px-2 py-1">Available</span>
@@ -60,18 +72,18 @@
                                         <span class="badge bg-danger px-2 py-1">Lost/Damaged</span>
                                     {% endif %}
                                 </td>
-                                
+
                                 <td>
                                     {% if item.assigned_to %}
-                                        <i class="bi bi-person-badge text-primary"></i> 
+                                        <i class="bi bi-person-badge text-primary"></i>
                                         {{ item.assigned_to.first_name }} {{ item.assigned_to.last_name|default:item.assigned_to.username }}
                                     {% else %}
                                         <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
-                                
+
                                 <td class="text-muted small">{{ item.last_updated|date:"d M Y, H:i" }}</td>
-                            <td>
+                                <td>
                                     {% if request.user.profile.role == 'police_commander' %}
                                         <a href="{% url 'update_inventory_item' item.id %}" class="btn btn-sm btn-outline-primary shadow-sm">
                                             <i class="bi bi-pencil-square"></i> Edit
@@ -81,7 +93,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="7" class="text-center py-5 text-muted">
                                     <i class="bi bi-boxes fs-1 d-block mb-3 opacity-50"></i>
                                     <h5>Inventory is Empty</h5>
                                     <p>No equipment or stationery has been logged yet.</p>

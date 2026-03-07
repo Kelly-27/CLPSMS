@@ -7,6 +7,7 @@ from django.contrib.auth.views import LoginView
 from .forms import OfficerCreationForm, EvidenceForm, InventoryItemForm, DutyRosterForm
 from .models import Case
 from .forms import CaseForm
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -15,6 +16,7 @@ from django.conf import settings
 from .models import Case, ArrestedPerson
 from .forms import CaseForm, ArrestedPersonForm
 import os
+from django.db.models import Q
 
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
@@ -98,18 +100,22 @@ def view_officers(request):
 
     return render(request, 'view_officers.html', {'officers': officers})
 
-
 @login_required
 def view_cases(request):
-    # Allow both the Commander and the Crime Desk to view the OB ledger
     if request.user.profile.role not in ['police_commander', 'crime_desk']:
         messages.error(request, "You do not have permission to view the cases list.")
         return redirect('reporting_desk')
+    query = request.GET.get('q', '')
+    if query:
+        cases = Case.objects.filter(
+            Q(ob_number__icontains=query) |
+            Q(incident_type__icontains=query) |
+            Q(description__icontains=query)
+        ).order_by('-date_logged')
+    else:
+        cases = Case.objects.all().order_by('-date_logged')
 
-    # Fetch all cases from the database, newest ones first
-    cases = Case.objects.all().order_by('-date_logged')
-
-    return render(request, 'view_cases.html', {'cases': cases})
+    return render(request, 'view_cases.html', {'cases': cases, 'query': query})
 
 @login_required
 def view_inmates(request):
@@ -120,16 +126,23 @@ def view_inmates(request):
     return render(request, 'view_inmates.html', {'inmates': inmates})
 
 @login_required
+@login_required
 def view_inventory(request):
     if not request.user.profile.role == 'police_commander':
         return redirect('police_commander_dashboard')
 
-    inventory = InventoryItem.objects.all()
-    return render(request, 'view_inventory.html', {'inventory': inventory})
+    query = request.GET.get('q', '')
 
+    if query:
+        inventory = InventoryItem.objects.filter(
+            Q(item_name__icontains=query) |
+            Q(category__icontains=query) |
+            Q(serial_number__icontains=query)
+        ).order_by('-date_added')
+    else:
+        inventory = InventoryItem.objects.all().order_by('-date_added')
 
-from django.shortcuts import get_object_or_404  # Ensure this is imported at the top
-
+    return render(request, 'view_inventory.html', {'inventory': inventory, 'query': query})
 
 @login_required
 def delete_officer(request, user_id):
@@ -157,10 +170,7 @@ def report_case(request):
     if request.method == 'POST':
         form = CaseForm(request.POST)
         if form.is_valid():
-            new_case = form.save(commit=False)
-            new_case.desk_officer = request.user
-            new_case.save()
-            form.save_m2m()
+            new_case = form.save()
             request.session['print_case_id'] = new_case.id
             messages.success(request, f"Case logged successfully! OB Number: {new_case.ob_number}")
             return redirect('reporting_desk')
@@ -359,10 +369,19 @@ def view_evidence(request):
         messages.error(request, "Permission Denied: You cannot view the evidence locker.")
         return redirect('reporting_desk')
 
-    evidence_items = Evidence.objects.all().order_by('-date_logged')
+    query = request.GET.get('q', '')
 
-    return render(request, 'view_evidence.html', {'evidence_items': evidence_items})
+    if query:
+        evidence_items = Evidence.objects.filter(
+            Q(item_name__icontains=query) |
+            Q(storage_location__icontains=query) |
+            Q(description__icontains=query) |
+            Q(related_case__ob_number__icontains=query)
+        ).order_by('-date_logged')
+    else:
+        evidence_items = Evidence.objects.all().order_by('-date_logged')
 
+    return render(request, 'view_evidence.html', {'evidence_items': evidence_items, 'query': query})
 @login_required
 def view_inventory(request):
     # Only allow Commanders and Officers to see the inventory

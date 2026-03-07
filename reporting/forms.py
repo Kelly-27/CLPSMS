@@ -55,9 +55,11 @@ class OfficerCreationForm(UserCreationForm):
 class CaseForm(forms.ModelForm):
     class Meta:
         model = Case
-        exclude = ['ob_number', 'desk_officer', 'status']
+        exclude = ['ob_number', 'status']
 
         widgets = {
+            'desk_officer': forms.Select(attrs={'class': 'form-select form-select-lg', 'required': True}),
+
             'incident_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g., Litein Main Stage'}),
             'incident_type': forms.Select(attrs={'class': 'form-select'}),
@@ -78,6 +80,7 @@ class CaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['assigned_officers'].queryset = User.objects.exclude(profile__role='crime_desk')
+
 class ArrestedPersonForm(forms.ModelForm):
     class Meta:
         model = ArrestedPerson
@@ -95,17 +98,23 @@ class ArrestedPersonForm(forms.ModelForm):
             'cell_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cell 1, Cell 2, etc.'}),
         }
 
+
 class EvidenceForm(forms.ModelForm):
     class Meta:
         model = Evidence
-        fields = ['item_name', 'description', 'related_case', 'status', 'storage_location', 'image']
+        fields = ['item_name', 'description', 'related_case', 'status', 'storage_location', 'image', 'logging_officer']
         widgets = {
-            'item_name': forms.TextInput(attrs={'class': 'form-control form-control-lg', 'placeholder': "e.g., Recovered 9mm Handgun"}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': "Describe the condition, serial numbers, etc."}),
+            'item_name': forms.TextInput(
+                attrs={'class': 'form-control form-control-lg', 'placeholder': "e.g., Recovered 9mm Handgun"}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3,
+                                                 'placeholder': "Describe the condition, serial numbers, etc."}),
             'related_case': forms.Select(attrs={'class': 'form-select form-select-lg'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
-            'storage_location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "e.g., Evidence Locker B-42"}),
+            'storage_location': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': "e.g., Evidence Locker B-42"}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
+
+            'logging_officer': forms.Select(attrs={'class': 'form-select form-select-lg', 'required': True}),
         }
 class InventoryItemForm(forms.ModelForm):
     class Meta:
