@@ -94,6 +94,16 @@
                                     {% else %}
                                         <span class="text-muted small"><i class="bi bi-camera-video-off"></i> None</span>
                                     {% endif %}
+
+                                    <a href="{% url 'evidence_chain_of_custody' item.id %}" class="btn btn-sm btn-outline-success" title="View Chain of Custody">
+                                        <i class="bi bi-link-45deg"></i> Ledger
+                                    </a>
+
+                                    {% if request.user.profile.role == 'police_commander' or request.user.profile.role == 'crime_desk' %}
+                                        <a href="{% url 'update_evidence_status' item.id %}" class="btn btn-sm btn-outline-warning ms-1" title="Update Status">
+                                            <i class="bi bi-arrow-left-right"></i> Move
+                                        </a>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% empty %}

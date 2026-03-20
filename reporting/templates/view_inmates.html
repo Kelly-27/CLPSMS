@@ -17,18 +17,18 @@
     {% endif %}
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-people-fill text-primary"></i> Station Custody Ledger</h2>
+        <h2><i class="bi bi-people-fill text-primary me-2"></i> Station Custody Ledger</h2>
 
         {% if request.user.profile.role == 'police_commander' %}
-    <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
-    {% elif request.user.profile.role == 'officer' %}
-    <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
-    {% else %}
-    <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
-    {% endif %}
+            <a href="{% url 'commander_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+        {% elif request.user.profile.role == 'officer' %}
+            <a href="{% url 'officer_dashboard' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+        {% else %}
+            <a href="{% url 'reporting_desk' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Desk</a>
+        {% endif %}
     </div>
 
-    <div class="card shadow-sm border-0 border-top border-primary border-4">
+    <div class="card shadow-sm border-0 border-top border-primary border-4 rounded-4">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover table-striped mb-0 align-middle">
@@ -84,18 +84,32 @@
                                 </td>
 
                                 <td>
-                                    <form method="POST" action="{% url 'update_inmate_status' inmate.id %}" class="d-flex align-items-center gap-1 mb-0">
-                                        {% csrf_token %}
-                                        <select name="status" class="form-select form-select-sm" style="width: 130px;">
-                                            <option value="in_custody" {% if inmate.status == 'in_custody' %}selected{% endif %}>In Custody</option>
-                                            <option value="released_bail" {% if inmate.status == 'released_bail' %}selected{% endif %}>Bailed</option>
-                                            <option value="transferred" {% if inmate.status == 'transferred' %}selected{% endif %}>Transferred</option>
-                                            <option value="released_free" {% if inmate.status == 'released_free' %}selected{% endif %}>Released Free</option>
-                                        </select>
-                                        <button type="submit" class="btn btn-sm btn-outline-primary" title="Save Status">
-                                            <i class="bi bi-check2"></i>
-                                        </button>
-                                    </form>
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <form method="POST" action="{% url 'update_inmate_status' inmate.id %}" class="d-flex align-items-center gap-1 mb-0">
+                                            {% csrf_token %}
+                                            <select name="status" class="form-select form-select-sm" style="width: 130px;">
+                                                <option value="in_custody" {% if inmate.status == 'in_custody' %}selected{% endif %}>In Custody</option>
+                                                <option value="released_bail" {% if inmate.status == 'released_bail' %}selected{% endif %}>Bailed</option>
+                                                <option value="transferred" {% if inmate.status == 'transferred' %}selected{% endif %}>Transferred</option>
+                                                <option value="released_free" {% if inmate.status == 'released_free' %}selected{% endif %}>Released Free</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Save Status">
+                                                <i class="bi bi-check2"></i>
+                                            </button>
+                                        </form>
+
+                                        {% if inmate.charges.exists %}
+                                            <a href="{% url 'generate_charge_sheet_pdf' inmate.charges.last.id %}" class="btn btn-sm btn-dark text-white shadow-sm" title="Download Official Charge Sheet">
+                                                <i class="bi bi-printer-fill"></i> Print P.F. 72
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'create_charge_sheet' inmate.id %}" class="btn btn-sm btn-danger text-white shadow-sm" title="Draft Charge Sheet">
+                                                <i class="bi bi-file-earmark-ruled-fill"></i> Charge
+                                            </a>
+                                        {% endif %}
+
+                                    </div>
                                 </td>
                             </tr>
                         {% empty %}

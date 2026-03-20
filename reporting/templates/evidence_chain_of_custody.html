@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Chain of Custody | {{ evidence.item_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-link-45deg text-success"></i> Immutable Chain of Custody</h2>
+            <p class="text-muted mb-0">Cryptographic Evidence Ledger for: <strong>{{ evidence.item_name }}</strong></p>
+        </div>
+        <a href="{% url 'view_evidence' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Locker
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 bg-light p-4">
+        <div class="timeline" style="border-left: 3px solid #198754; margin-left: 20px; padding-left: 30px;">
+            
+            {% for block in ledger_entries %}
+            <div class="mb-5 position-relative">
+                <span class="position-absolute bg-success rounded-circle" style="width: 15px; height: 15px; left: -39px; top: 5px; border: 3px solid white;"></span>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between py-2">
+                        <span class="fw-bold"><i class="bi bi-box me-2"></i>Block #{{ forloop.counter }}</span>
+                        <small>{{ block.timestamp|date:"M d, Y H:i:s" }}</small>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block">Action Taken:</small>
+                                <span class="badge bg-primary rounded-pill">{{ block.action }}</span>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <small class="text-muted d-block">Handled By:</small>
+                                <span class="fw-bold text-dark">{{ block.handled_by.get_full_name|default:block.handled_by.username }}</span>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-3 small text-secondary border-start border-3 ps-2">{{ block.details }}</p>
+
+                        <div class="bg-dark rounded p-2 text-warning font-monospace small" style="word-break: break-all;">
+                            <div class="mb-1 text-muted">
+                                <i class="bi bi-arrow-return-right"></i> Prev Hash: 
+                                <span class="{% if block.previous_hash == 'GENESIS_BLOCK' %}text-success fw-bold{% else %}text-light{% endif %}">
+                                    {{ block.previous_hash }}
+                                </span>
+                            </div>
+                            <div>
+                                <i class="bi bi-lock-fill text-success"></i> Curr Hash: 
+                                <span class="text-success">{{ block.current_hash }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> No cryptographic blocks found for this item.
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Add Wanted Target | Litein Police{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 border-top border-danger border-4 rounded-4">
+                <div class="card-header bg-white pt-4 pb-2 border-0 d-flex justify-content-between align-items-center">
+                    <h4 class="fw-bold mb-0"><i class="bi bi-crosshair text-danger me-2"></i> Add High-Priority Target</h4>
+                    <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                </div>
+                <div class="card-body p-4">
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Full Name</label>
+                                {{ form.full_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Alias (Optional)</label>
+                                {{ form.alias }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Age</label>
+                                {{ form.age }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Height</label>
+                                {{ form.height }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Threat Level</label>
+                                {{ form.threat_level }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Crimes / Wanted For</label>
+                                {{ form.crimes }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Last Known Location</label>
+                                {{ form.last_known_location }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary"><i class="bi bi-camera-fill me-1"></i> Mugshot / Image</label>
+                            {{ form.image }}
+                            <small class="text-muted">Upload a clear photo of the suspect (optional but highly recommended).</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary">Physical Description & Notes</label>
+                            {{ form.description }}
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm py-3">
+                            <i class="bi bi-broadcast me-2"></i> Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

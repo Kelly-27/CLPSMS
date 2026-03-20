@@ -33,7 +33,14 @@
                 <div class="row">
                     {% bootstrap_form form %}
                 </div>
+                <hr class="my-4">
 
+                <div class="mb-4 p-3 rounded border border-danger bg-light shadow-sm">
+                    <label class="form-label fw-bold text-dark"><i class="bi bi-person-badge me-2"></i>Booking Officer</label>
+                    {{ form.arresting_officer }}
+                    <small class="text-muted d-block mt-1">Please select your name to officially sign this person into custody.</small>
+                    <div class="text-danger small">{{ form.arresting_officer.errors }}</div>
+                </div>
                 <div class="d-grid gap-2 mt-4">
                     <button type="submit" class="btn btn-success btn-lg">
                         <i class="bi bi-lock-fill"></i>Book Suspect

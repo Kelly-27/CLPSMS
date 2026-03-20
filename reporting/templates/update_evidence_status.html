@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Evidence | {{ evidence.item_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h4 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Update Evidence Status</h4>
+        </div>
+        <div class="card-body p-4">
+            
+            <div class="alert alert-info border-0 shadow-sm mb-4">
+                <strong>Item:</strong> {{ evidence.item_name }} <br>
+                <strong>Current Status:</strong> <span class="badge bg-secondary">{{ evidence.get_status_display }}</span>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">New Status Destination <span class="text-danger">*</span></label>
+                    <select name="status" class="form-select border-secondary" required>
+                        <option value="" disabled selected>-- Select New Location --</option>
+                        <option value="in_locker">In Locker</option>
+                        <option value="at_lab">At Forensics Lab</option>
+                        <option value="in_court">Checked Out to Court</option>
+                        <option value="released">Released to Owner</option>
+                        <option value="destroyed">Destroyed / Disposed</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Reason for Transfer (Chain of Custody) <span class="text-danger">*</span></label>
+                    <textarea name="details" class="form-control border-secondary" rows="3" placeholder="e.g., Checked out by Officer Kiprono for hearing at Litein Law Courts..." required></textarea>
+                    <div class="form-text text-muted"><i class="bi bi-lock-fill text-success"></i> This note will be permanently hashed into the blockchain ledger.</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'view_evidence' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4"><i class="bi bi-shield-check me-1"></i> Update & Secure Hash</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

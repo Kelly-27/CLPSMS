@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>P.F. 72 - Charge Sheet</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 2cm;
+        }
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 12pt;
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-number {
+            font-weight: bold;
+            font-size: 14pt;
+            text-align: right;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 18pt;
+            text-decoration: underline;
+            margin-top: -10px;
+        }
+        .section-title {
+            font-weight: bold;
+            background-color: #f0f0f0;
+            padding: 5px;
+            margin-top: 20px;
+            border: 1px solid #000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        .particulars {
+            border: 1px solid #000;
+            padding: 15px;
+            min-height: 150px;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+        .footer-signatures {
+            margin-top: 50px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-number">P.F. 72</div>
+
+    <div class="header">
+        <div class="title">KENYA POLICE SERVICE</div>
+        <h3 style="margin: 5px 0;">CHARGE SHEET</h3>
+    </div>
+
+    <table>
+        <tr>
+            <td><strong>Police Station:</strong> {{ charge.police_station|default:"LITEIN POLICE STATION" }}</td>
+            <td><strong>Date to Court:</strong> {{ charge.date_to_court|date:"d M Y"|default:"TBD" }}</td>
+        </tr>
+        <tr>
+            <td><strong>OB Number:</strong> {% if charge.related_case %}{{ charge.related_case.ob_number }}{% else %}N/A{% endif %}</td>
+            <td><strong>Court File No:</strong> {{ charge.court_file_no|default:"__________" }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">A. PARTICULARS OF THE ACCUSED PERSON</div>
+    <table>
+        <tr>
+            <td><strong>Name:</strong> {{ charge.accused_person.first_name }} {{ charge.accused_person.last_name }}</td>
+            <td><strong>ID / Passport No:</strong> {{ charge.accused_person.id_number|default:"NOT PROVIDED" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Gender:</strong> {{ charge.accused_person.gender|upper }}</td>
+            <td><strong>Age:</strong> {{ charge.accused_person.age|default:"N/A" }}</td>
+        </tr>
+        <tr>
+            <td><strong>Status:</strong> {{ charge.get_remanded_or_bailed_display|upper }}</td>
+            <td><strong>Arresting Officer:</strong> {{ charge.accused_person.arresting_officer.first_name|default:charge.accused_person.arresting_officer.username }} {{ charge.accused_person.arresting_officer.last_name }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">B. STATEMENT OF OFFENCE</div>
+    <div style="padding: 10px; border: 1px solid #000; border-top: none; text-transform: uppercase; font-weight: bold;">
+        {{ charge.law_broken.offense_name }} CONTRARY TO {{ charge.law_broken.section }} OF THE {{ charge.law_broken.act_name }}
+    </div>
+
+    <div class="section-title">C. PARTICULARS OF OFFENCE</div>
+    <div class="particulars">
+        {{ charge.accused_person.first_name|upper }} {{ charge.accused_person.last_name|upper }}, {{ charge.particulars_of_offense }}
+    </div>
+
+    <div class="section-title">D. WITNESSES (NAME & NATIONALITY)</div>
+    <div style="border: 1px solid #000; padding: 15px; min-height: 60px; margin-top: 10px; text-transform: uppercase;">
+        {{ charge.witnesses|default:"NONE RECORDED"|linebreaksbr }}
+    </div>
+
+    <table style="border: none; margin-top: 40px;">
+        <tr style="border: none;">
+            <td style="border: none; width: 50%;">
+                <strong>Date of Arrest:</strong> {{ charge.date_of_arrest|date:"d M Y" }}<br><br><br>
+                <strong>Complainant:</strong> {{ charge.complainant|default:"THE REPUBLIC" }}
+            </td>
+            <td style="border: none; width: 50%; text-align: right;">
+                <div>___________________________________</div>
+                <div style="margin-top: 5px;"><strong>Officer Preparing Charge</strong></div>
+                <div style="font-size: 10pt; color: #555;">{{ charge.prepared_by.first_name }} {{ charge.prepared_by.last_name }} ({{ charge.prepared_by.username }})</div>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

@@ -2,17 +2,16 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Profile, ArrestedPerson, Evidence, InventoryItem, DutyRoster
-from .models import Case
-
+from .models import Profile, ArrestedPerson, Evidence, InventoryItem, DutyRoster, ChargeSheet, Case, WantedPerson
+from .models import LeaveRequest
 
 class OfficerCreationForm(UserCreationForm):
-    # User fields
+
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
 
-    # Profile fields
+
     rank = forms.ChoiceField(choices=Profile.RANK_CHOICES, required=True)
     badge_number = forms.CharField(max_length=20, required=True, label="Badge Number (Used as Username)")
     phone = forms.CharField(max_length=15, required=False)
@@ -74,18 +73,23 @@ class CaseForm(forms.ModelForm):
                                                      'placeholder': 'Stolen items, vehicle plates, weapons used...'}),
 
             'assigned_officers': forms.SelectMultiple(
-                attrs={'class': 'form-select', 'help_text': 'Hold CTRL to select multiple officers'}),
+                attrs={'class': 'form-select'}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['assigned_officers'].queryset = User.objects.exclude(profile__role='crime_desk')
+        self.fields['assigned_officers'].required = False
+        self.fields[
+            'assigned_officers'].help_text = 'Hold CTRL to select multiple officers, or LEAVE BLANK to let the system auto-assign based on current workload.'
 
 class ArrestedPersonForm(forms.ModelForm):
     class Meta:
         model = ArrestedPerson
         fields = ['related_case', 'first_name', 'last_name', 'id_number', 'gender', 'age',
-                  'phone_number', 'offense', 'cell_number']
+                  'phone_number', 'offense', 'cell_number', 'arresting_officer']
+
         widgets = {
             'related_case': forms.Select(attrs={'class': 'form-select'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
@@ -96,6 +100,8 @@ class ArrestedPersonForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}),
             'offense': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g., Theft, Assault...'}),
             'cell_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cell 1, Cell 2, etc.'}),
+
+            'arresting_officer': forms.Select(attrs={'class': 'form-select form-select-lg', 'required': True}),
         }
 
 
@@ -139,4 +145,59 @@ class DutyRosterForm(forms.ModelForm):
             'shift_time': forms.Select(attrs={'class': 'form-select'}),
             'duty_type': forms.Select(attrs={'class': 'form-select'}),
             'commander_notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Optional instructions (e.g., Patrol Sector 4)'}),
+        }
+
+
+class ChargeSheetForm(forms.ModelForm):
+    class Meta:
+        model = ChargeSheet
+        fields = [
+            'law_broken', 'particulars_of_offense', 'date_of_arrest',
+            'arrested_with_warrant', 'remanded_or_bailed',
+            'court_file_no', 'date_to_court', 'complainant', 'police_station', 'witnesses'
+        ]
+        widgets = {
+            'law_broken': forms.Select(attrs={'class': 'form-select'}),
+            'particulars_of_offense': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'date_of_arrest': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'date_to_court': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'remanded_or_bailed': forms.Select(attrs={'class': 'form-select'}),
+            'court_file_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'complainant': forms.TextInput(attrs={'class': 'form-control'}),
+            'police_station': forms.TextInput(attrs={'class': 'form-control'}),
+            'witnesses': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'date_of_arrest': forms.DateInput(attrs={'class': 'form-control border-secondary', 'type': 'date'}),
+            'date_to_court': forms.DateInput(attrs={'class': 'form-control border-secondary', 'type': 'date'}),
+            'court_file_no': forms.TextInput(attrs={'class': 'form-control border-secondary', 'placeholder': 'Leave blank if unknown'}),
+            'complainant': forms.TextInput(attrs={'class': 'form-control border-secondary'}),
+            'police_station': forms.TextInput(attrs={'class': 'form-control border-secondary'}),
+            'remanded_or_bailed': forms.Select(attrs={'class': 'form-select border-secondary'}),
+            'arrested_with_warrant': forms.CheckboxInput(attrs={'class': 'form-check-input ms-2'})
+        }
+
+class LeaveRequestForm(forms.ModelForm):
+    class Meta:
+        model = LeaveRequest
+        fields = ['leave_type', 'start_date', 'end_date', 'reason']
+        widgets = {
+            'leave_type': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+class WantedPersonForm(forms.ModelForm):
+    class Meta:
+        model = WantedPerson
+        fields = ['full_name', 'alias', 'image', 'age', 'height', 'threat_level', 'last_known_location', 'crimes', 'description']
+        widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'alias': forms.TextInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+            'height': forms.TextInput(attrs={'class': 'form-control'}),
+            'threat_level': forms.Select(attrs={'class': 'form-select'}),
+            'last_known_location': forms.TextInput(attrs={'class': 'form-control'}),
+            'crimes': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
